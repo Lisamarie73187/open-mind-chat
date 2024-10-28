@@ -1,4 +1,7 @@
 import React from "react";
+import Image from 'next/image';
+import AvatarOne from '../assets/avatarOne.png';
+import AvatarTwo from '../assets/avatarTwo.png';
 
 const MainPage: React.FC = (): JSX.Element => {
   return (
@@ -9,11 +12,13 @@ const MainPage: React.FC = (): JSX.Element => {
       </header>
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
         <div className="flex items-start space-x-3">
-          <img
-            src="/bot-avatar.png"
+        <Image
+            src={AvatarOne}
             alt="Bot Avatar"
-            className="w-10 h-10 rounded-full border border-gray-300"
-          />
+            width={40}
+            height={40}
+            className="rounded-full border border-gray-300"
+        />
           <div className="bg-gray-200 text-gray-800 p-3 rounded-lg shadow-md max-w-xl">
             Hello! Welcome to OpenMind Chat. How are you feeling today?
           </div>
@@ -23,11 +28,13 @@ const MainPage: React.FC = (): JSX.Element => {
           <div className="bg-blue-500 text-white p-3 rounded-lg shadow-md max-w-xl">
             I'm feeling good, thank you! How about you?
           </div>
-          <img
-            src="/user-avatar.png"
-            alt="User Avatar"
-            className="w-10 h-10 rounded-full border border-gray-300"
-          />
+          <Image
+            src={AvatarTwo}
+            alt="Bot Avatar"
+            width={40}
+            height={40}
+            className="rounded-full border border-gray-300"
+        />
         </div>
       </main>
       <footer className="bg-white p-4 shadow-md flex items-center">
