@@ -58,11 +58,7 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center h-[80vh] bg-gray-100 w-full mx-auto shadow-xl rounded-lg overflow-hidden ">
-      <header className="bg-cyan-600 text-white text-center p-4">
-        <h1 className="text-2xl font-bold">Open Mind Chat</h1>
-        <p className="text-sm">A space for mindful conversations</p>
-      </header>
+    <div className="flex flex-col justify-center h-[80vh] bg-purple-50 mx-auto shadow-xl rounded-lg overflow-hidden opacity-80">
       <main className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
        {[...messages].reverse().map((msg, index) => (
           <div key={index}>
@@ -80,7 +76,7 @@ const Chat: React.FC = () => {
                 />
               </div>
             ) : (
-              <div className="flex items-start space-x-3 space-y-0">
+              <div className="flex items-start space-x-3 space-y-0 opacity-100">
                 <Image
                   src={AvatarOne}
                   alt="Bot Avatar"
@@ -88,7 +84,7 @@ const Chat: React.FC = () => {
                   height={40}
                   className="rounded-full border border-gray-300"
                 />
-                <div className="bg-gray-200 text-gray-800 p-3 rounded-lg shadow-md max-w-xl">
+                <div className="bg-white text-gray-800 p-3 rounded-lg shadow-md max-w-xl opacity-100">
                   {msg.message}
                 </div>
               </div>

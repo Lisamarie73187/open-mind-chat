@@ -4,8 +4,6 @@ import { botSystemRole, botSystemRoleTwo } from '../botSystemRole';
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
 const apiUrl = process.env.NEXT_PUBLIC_OPENAI_URL || '';
 
-console.log('API URL:', apiUrl);
-
 export async function POST(request: Request) {
   const { message } = await request.json();
 

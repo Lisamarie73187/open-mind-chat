@@ -1,19 +1,34 @@
 import Chat from "../components/chat/Chat";
+import { Open_Sans } from 'next/font/google';
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['300', '800'],
+});
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[1fr_0px] items-center justify-items-center min-h-screen p-8 px-20 gap-4 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-row gap-8 row-start-1 items-center sm:items-start w-full">
-        <div className="w-full">
-          <Chat/>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center w-full">
-          <div className="text-cyan-900 text-sm">
-            Lisa Marie Herzberg ©2024
-          </div>
-      </footer>
+  <div className="bg-custom grid grid-rows-[auto_1fr_auto] min-h-screen gap-4 font-[family-name:var(--font-geist-sans)]">
+    <div className="p-2 self-start w-full text-left">
+      <div className={`${openSans.className} font-bold text-[20px] px-2 text-cyan-900`}>
+        + Open Mind Chat
+      </div>
+      <div className={`italic text-[16px] px-2 text-cyan-900`}>
+        A Space for Mindful Conversations
+      </div>
     </div>
+    <main className="flex flex-row gap-8 row-start-2 items-center w-full px-40">
+      <div className="w-full">
+        <Chat />
+      </div>
+    </main>
+    <footer className="flex justify-center w-full p-4">
+    <div className="text-cyan-900 text-xs">
+      Lisa Marie Herzberg ©2024
+    </div>
+  </footer>
+</div>
+
   );
 }
 

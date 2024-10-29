@@ -11,6 +11,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        customLimeHover: "#bdd87d",
+        customLime: "#c9ea7a",
+      },
+      fontFamily: {
+        roboto: ['var(--font-roboto)', 'sans-serif'],
       },
     },
   },
