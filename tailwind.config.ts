@@ -14,8 +14,9 @@ const config: Config = {
         customLimeHover: "#bdd87d",
         customLime: "#c9ea7a",
       },
-      fontFamily: {
-        roboto: ['var(--font-roboto)', 'sans-serif'],
+      padding: {
+        '20': '5.5rem',
+        '200': '200px',
       },
     },
   },

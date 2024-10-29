@@ -2,7 +2,7 @@ import Login from "./components/Login";
 
 export default function Home() {
   return (
-    <div className="bg-custom min-h-screen">
+    <div className="flex-grow">
       <Login/>
     </div>
   );

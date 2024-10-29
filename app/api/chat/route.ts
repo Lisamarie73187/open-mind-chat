@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         messages: [
           { 
             role: 'system', 
-            content: botSystemRoleTwo,
+            content: botSystemRole,
           },
             { role: 'user', content: message },
         ],

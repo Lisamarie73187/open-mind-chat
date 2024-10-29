@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
 import { useRouter } from 'next/navigation';
+import { Merriweather } from 'next/font/google';
+
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
 
 export default function Welcome() {
   const router = useRouter();
@@ -10,15 +16,15 @@ export default function Welcome() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-custom p-8 text-center">
-      <h1 className="text-5xl font-bold text-cyan-900 mb-4">Hello Daniel</h1>
+    <div className="flex flex-col flex-grow items-center pt-20 p-8 text-center">
+      <h1 className="text-5xl text-cyan-900 mb-4">Welcome Daniel</h1>
       
-      <h2 className="text-7xl text-cyan-900 mb-6">How are you feeling today?</h2>
+      <h2 className={`${merriweather.className} text-7xl leading-tight max-w-xl text-cyan-900 mb-8`}>How are you feeling today?</h2>
       
-      <p className="text-2xl text-cyan-900 max-w-md mb-8">
-        Whether you're in need of calm, a compassionate listener, or a safe place to reflect, Ami is here to listen.
+      <p className="text-2xl text-cyan-900 max-w-2xl mb-20">
+      Whether you're seeking a moment of peace, a compassionate listener, or a safe space to express your thoughts,        
+      <span className="font-bold"> Ami</span> is here to listen and offer support.
       </p>
-
       <button
         type="button"
         onClick={handleChatNavigation}
