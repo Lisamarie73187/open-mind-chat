@@ -64,7 +64,7 @@ const Chat: React.FC = () => {
         <p className="text-sm">A space for mindful conversations</p>
       </header>
       <main className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
-       {[...mock].reverse().map((msg, index) => (
+       {[...messages].reverse().map((msg, index) => (
           <div key={index}>
             {msg.role === "user" ? (
               <div className="flex items-start justify-end space-x-3 space-y-1 w-full my-4">

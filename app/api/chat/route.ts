@@ -1,12 +1,12 @@
-// app/api/chat/route.ts
 import { NextResponse } from 'next/server';
-import { botSystemRole } from '../botSystemRole';
+import { botSystemRole, botSystemRoleTwo } from '../botSystemRole';
 
-const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-const apiUrl = process.env.NEXT_PUBLIC_OPENAI_API_URL;
+const apiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
+const apiUrl = process.env.NEXT_PUBLIC_OPENAI_URL || '';
+
+console.log('API URL:', apiUrl);
 
 export async function POST(request: Request) {
-    console.log('asdfsdf')
   const { message } = await request.json();
 
   if (!message) {
@@ -14,7 +14,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    if (!apiUrl) {
+        return NextResponse.json({ error: 'API URL is not defined' }, { status: 500 });
+    }
+
+    const openaiResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,22 +29,22 @@ export async function POST(request: Request) {
         messages: [
           { 
             role: 'system', 
-            content: botSystemRole,
+            content: botSystemRoleTwo,
           },
             { role: 'user', content: message },
         ],
-        max_tokens: 100,
-        temperature: 0.4,
+        max_tokens: 70,
+        temperature: 0.9,
       }),
     });
 
-    // const data = await openaiResponse.json();
-    const data = mockResponse
+    const data = await openaiResponse.json();
+    // const data = mockResponse
 
     if (openaiResponse.ok) {
       return NextResponse.json({ response: data.choices[0].message.content });
     } else {
-      // return NextResponse.json({ error: data.error.message }, { status: openaiResponse.status });
+      return NextResponse.json({ error: data.error.message }, { status: openaiResponse.status });
     }
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
