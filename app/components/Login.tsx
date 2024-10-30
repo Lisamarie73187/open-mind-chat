@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
-import { auth } from "../config/firebase";
+import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Login: React.FC = () => {
@@ -12,7 +12,6 @@ const Login: React.FC = () => {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const router = useRouter();
 
-  // Function to sign up a new user
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -22,15 +21,12 @@ const Login: React.FC = () => {
       await updateProfile(user, {
         displayName: name,
       });
-
-      console.log("User signed up:", user);
       router.push("/welcome");
     } catch (error) {
       alert("Signup error: " + error);
     }
   };
 
-  // Function to log in an existing user
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -47,7 +43,6 @@ const Login: React.FC = () => {
       <Head>
         <title>Login - Open Mind Chat</title>
       </Head>
-      
       <div className="flex items-center justify-center pt-200">
         <form
           onSubmit={isSigningUp ? handleSignUp : handleLogin}
@@ -56,7 +51,6 @@ const Login: React.FC = () => {
           <h2 className="text-2xl font-bold text-cyan-900 mb-6 text-center">
             {isSigningUp ? "Sign Up" : "Login"} to Open Mind Chat
           </h2>
-          
           {isSigningUp && (
             <input
               type="text"
@@ -67,7 +61,6 @@ const Login: React.FC = () => {
               required
             />
           )}
-          
           <input
             type="email"
             placeholder="Email"
@@ -76,7 +69,6 @@ const Login: React.FC = () => {
             className="border border-gray-300 p-3 rounded-lg mb-4 w-full focus:outline-none focus:border-cyan-500"
             required
           />
-          
           <input
             type="password"
             placeholder="Password"
@@ -85,14 +77,12 @@ const Login: React.FC = () => {
             className="border border-gray-300 p-3 rounded-lg mb-6 w-full focus:outline-none focus:border-cyan-500"
             required
           />
-          
           <button
             type="submit"
             className="w-full bg-customLime hover:bg-customLimeHover text-white font-semibold p-3 rounded-lg transition-colors duration-300"
           >
             {isSigningUp ? "Sign Up" : "Log In"}
           </button>
-          
           <p className="text-center mt-4">
             {isSigningUp ? "Already have an account?" : "Don’t have an account?"}{" "}
             <button

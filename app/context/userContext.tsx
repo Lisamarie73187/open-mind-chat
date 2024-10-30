@@ -1,7 +1,7 @@
 "use client"
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { auth } from "../config/firebase"; // Adjust the path as needed
+import { auth } from "../../config/firebase"; // Adjust the path as needed
 
 // 1. Define a type for the User profile
 interface User {
