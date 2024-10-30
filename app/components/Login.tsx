@@ -2,18 +2,43 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
+import { auth } from "../config/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState<string>("");
+  const [name, setName] = useState<string>(""); // New state for name
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Function to sign up a new user
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === "a" && password === "b") {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: name,
+      });
+
+      console.log("User signed up:", user);
       router.push("/welcome");
-    } else {
-      alert("Incorrect username or password");
+    } catch (error) {
+      alert("Signup error: " + error);
+    }
+  };
+
+  // Function to log in an existing user
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in:", userCredential.user);
+      router.push("/welcome");
+    } catch (error) {
+      alert("Login error: " + error);
     }
   };
 
@@ -25,18 +50,29 @@ const Login: React.FC = () => {
       
       <div className="flex items-center justify-center pt-200">
         <form
-          onSubmit={handleLogin}
+          onSubmit={isSigningUp ? handleSignUp : handleLogin}
           className="bg-purple-50 p-8 rounded-lg shadow-lg w-full max-w-md"
         >
           <h2 className="text-2xl font-bold text-cyan-900 mb-6 text-center">
-            Login to Open Mind Chat
+            {isSigningUp ? "Sign Up" : "Login"} to Open Mind Chat
           </h2>
           
+          {isSigningUp && (
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border border-gray-300 p-3 rounded-lg mb-4 w-full focus:outline-none focus:border-cyan-500"
+              required
+            />
+          )}
+          
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 p-3 rounded-lg mb-4 w-full focus:outline-none focus:border-cyan-500"
             required
           />
@@ -54,8 +90,19 @@ const Login: React.FC = () => {
             type="submit"
             className="w-full bg-customLime hover:bg-customLimeHover text-white font-semibold p-3 rounded-lg transition-colors duration-300"
           >
-            Log In
+            {isSigningUp ? "Sign Up" : "Log In"}
           </button>
+          
+          <p className="text-center mt-4">
+            {isSigningUp ? "Already have an account?" : "Don’t have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => setIsSigningUp(!isSigningUp)}
+              className="text-cyan-700 font-semibold underline"
+            >
+              {isSigningUp ? "Log in" : "Sign up"}
+            </button>
+          </p>
         </form>
       </div>
     </>

@@ -81,7 +81,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className="min-h-screen flex justify-center bg-custom p-4">
-      <div className="w-full max-w-4xl bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
+      <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
         <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse space-y-reverse space-y-4">
           {[...messages].reverse().map((msg, index) => (
             <div

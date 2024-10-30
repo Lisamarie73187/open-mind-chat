@@ -2,6 +2,7 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { Merriweather } from 'next/font/google';
+import { useUser } from "../context/userContext";
 
 const merriweather = Merriweather({
   subsets: ['latin'],
@@ -10,6 +11,7 @@ const merriweather = Merriweather({
 
 export default function Welcome() {
   const router = useRouter();
+  const { user, loading } = useUser();
 
   const handleChatNavigation = () => {
     router.push('/chat');
@@ -17,7 +19,10 @@ export default function Welcome() {
 
   return (
     <div className="flex flex-col flex-grow items-center pt-20 p-8 text-center">
-      <h1 className="text-5xl text-cyan-900 mb-4">Welcome Daniel</h1>
+      {loading && <p>Loading...</p>}
+      {user && !loading && 
+      <>
+      <h1 className="text-5xl text-cyan-900 mb-4">Welcome {user.name}</h1>
       
       <h2 className={`${merriweather.className} text-7xl leading-tight max-w-xl text-cyan-900 mb-8`}>How are you feeling today?</h2>
       
@@ -32,6 +37,9 @@ export default function Welcome() {
       >
         Let’s Chat
       </button>
+      </>
+      }
+    
     </div>
   );
 }

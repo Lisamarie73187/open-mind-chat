@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Open_Sans } from 'next/font/google';
+import { UserProvider } from "./context/userContext";
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -42,7 +43,9 @@ export default function RootLayout({
         A Space for Mindful Conversations
       </div>
     </div>
-        {children}
+    <UserProvider>
+      {children}
+    </UserProvider>
           <div className="flex justify-center text-cyan-900 text-xs pb-2">
             Lisa Marie Herzberg ©2024
           </div>
