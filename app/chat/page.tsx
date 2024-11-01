@@ -5,7 +5,7 @@ import AvatarOne from "../../assets/avatarOne.png";
 import AvatarTwo from "../../assets/avatarTwo.png";
 import { firstWelcomeChat } from "../api/botSystemRole";
 
-interface Message {
+interface MessageObj {
   message: string;
   timestamp: string;
   role: string;
@@ -13,7 +13,7 @@ interface Message {
 
 const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageObj[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [botTyping, setBotTyping] = useState<boolean>(false); // New state for typing indicator
 
@@ -44,7 +44,7 @@ const Chat: React.FC = () => {
 
   const sendMessage = async () => {
     if (message.trim()) {
-      const newMessage: Message = {
+      const newMessage: MessageObj = {
         message,
         timestamp: new Date().toString(),
         role: "user",
@@ -56,7 +56,7 @@ const Chat: React.FC = () => {
       setLoading(true);
 
       try {
-        const responseMessage = await getAIResponse(message);
+        const responseMessage = await getAIResponse(newMessage);
 
         setTimeout(() => {
           setBotTyping(false);
@@ -74,13 +74,13 @@ const Chat: React.FC = () => {
     }
   };
 
-  const getAIResponse = async (userMessage: string) => {
+  const getAIResponse = async (userMessageObj: MessageObj) => {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: userMessage }),
+      body: JSON.stringify(userMessageObj),
     });
 
     const data = await response.json();

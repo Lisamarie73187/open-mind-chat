@@ -1,57 +1,76 @@
 "use client"
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { auth } from "../../config/firebase"; // Adjust the path as needed
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
-// 1. Define a type for the User profile
 interface User {
   name: string | null;
   email: string | null;
   uid: string;
+  additionalData?: any;
 }
 
-// 2. Define the context type
 interface UserContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 }
 
-// 3. Create the UserContext
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// 4. Create a custom hook for easy access to the context
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
-  if (!context) throw new Error("useUser must be used within a UserProvider");
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
   return context;
 };
 
-// 5. Define props for the UserProvider
 interface UserProviderProps {
   children: ReactNode;
 }
 
-// 6. Set up the UserProvider to handle user authentication state
+const fetchAdditionalUserData = async (uid: string) => {
+  try {
+    const response = await fetch(`/api/users?uid=${uid}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.user;
+    } else {
+      console.error('Error fetching additional user data:', response.statusText);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching additional user data:', error);
+    return null;
+  }
+};
+
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Listen for authentication changes and update state
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         const { displayName, email, uid } = firebaseUser;
-        setUser({ name: displayName, email, uid });
+        let userData: User = { name: displayName, email, uid };
+        const additionalData = await fetchAdditionalUserData(uid);
+        if (additionalData) {
+          userData = { ...userData, additionalData };
+        }
+        setUser(userData);
       } else {
         setUser(null);
       }
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
     </UserContext.Provider>
   );
