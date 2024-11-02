@@ -7,7 +7,7 @@ interface User {
   name: string | null;
   email: string | null;
   uid: string;
-  additionalData?: any;
+  loginTime: string;
 }
 
 interface UserContextType {
@@ -30,7 +30,7 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
-const fetchAdditionalUserData = async (uid: string) => {
+const fetchUserData = async (uid: string) => {
   try {
     const response = await fetch(`/api/users?uid=${uid}`);
     if (response.ok) {
@@ -53,12 +53,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        const { displayName, email, uid } = firebaseUser;
-        let userData: User = { name: displayName, email, uid };
-        const additionalData = await fetchAdditionalUserData(uid);
-        if (additionalData) {
-          userData = { ...userData, additionalData };
-        }
+        const { uid } = firebaseUser;
+        let userData = await fetchUserData(uid);
         setUser(userData);
       } else {
         setUser(null);

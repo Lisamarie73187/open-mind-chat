@@ -12,6 +12,7 @@ const merriweather = Merriweather({
 export default function Welcome() {
   const router = useRouter();
   const { user, loading } = useUser();
+  console.log({user});
 
   const handleChatNavigation = () => {
     router.push('/chat');

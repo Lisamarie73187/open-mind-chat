@@ -136,7 +136,7 @@ const Chat: React.FC = () => {
                     height={40}
                     className="rounded-full border border-gray-300"
                   />
-                  <div className="bg-white text-gray-800 p-3 rounded-lg shadow-md text-md">
+                  <div className="bg-white text-gray-800 p-3 rounded-lg shadow-md text-md w-3/4">
                     {msg.message}
                   </div>
                 </div>
