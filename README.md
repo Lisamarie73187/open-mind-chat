@@ -48,7 +48,7 @@
    ```bash
    npm run dev
 
-4. Add your openAI Keys:
+4. Add your openAI Keys
 
 ## Contributions
 Contributions are welcome! Please open an issue or submit a pull request for any suggestions or improvements.
