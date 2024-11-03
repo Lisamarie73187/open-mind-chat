@@ -1,5 +1,5 @@
-"use client"
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+"use client";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 
@@ -54,7 +54,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         const { uid } = firebaseUser;
-        let userData = await fetchUserData(uid);
+        const userData = await fetchUserData(uid);
         setUser(userData);
       } else {
         setUser(null);
@@ -63,10 +63,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [fetchUserData]);
+
+  const contextValue = useMemo(() => ({ user, setUser, loading }), [user, loading]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );

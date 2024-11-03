@@ -46,8 +46,8 @@ export async function POST(request: Request) {
           { role: 'system', content: botSystemRole },
           { role: messageObj.role, content: messageObj.message },
         ],
-        max_tokens: 70,
-        temperature: 0.5,
+        max_tokens: 150,
+        temperature: 0.8,
       }),
     });
 
