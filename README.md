@@ -34,7 +34,7 @@
 ### Installation Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/open-mind-chat.git
+   git clone https://github.com/Lisamarie73187/open-mind-chat.git
 
 2. Navigate to the project directory:
    ```bash
