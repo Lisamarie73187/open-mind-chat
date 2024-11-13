@@ -140,7 +140,7 @@ const Login: React.FC = () => {
               {switchText}{" "}
               <button
                 type="button"
-                onClick={() => setIsSigningUp((prev) => !prev)}
+                onClick={() => setIsSigningUp(() => !isSigningUp)}
                 className="text-cyan-700 font-semibold underline"
               >
                 {toggleAuthModeText}
