@@ -10,14 +10,12 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { User } from "../api/users/route";
-import { useUser } from "../context/userContext";
 
 const Login: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isSigningUp, setIsSigningUp] = useState(false);
-  const user = useUser();
   const router = useRouter();
 
   const handleAuthAction = useCallback(
@@ -37,7 +35,6 @@ const Login: React.FC = () => {
         } else {
           await signInWithEmailAndPassword(auth, email, password);
         }
-        router.push("/welcome");
       } catch (error) {
         alert(`Error: ${error}`);
       }
@@ -58,9 +55,7 @@ const Login: React.FC = () => {
       } catch (error) {
         console.error("Error adding user:", error);
       }
-    },
-    []
-  );
+    },[]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -84,19 +79,7 @@ const Login: React.FC = () => {
         <title>Login - Open Mind Chat</title>
       </Head>
       <div className="flex items-center justify-center pt-200">
-        {user.user ? (
-          <div className="bg-purple-50 p-8 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-2xl font-bold text-cyan-900 mb-6 text-center">
-              You are already logged in
-            </h2>
-            <button
-              onClick={handleLogout}
-              className="w-full bg-customLime hover:bg-customLimeHover text-white font-semibold p-3 rounded-lg transition-colors duration-300"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
+       
           <form
             onSubmit={handleAuthAction}
             className="bg-purple-50 p-8 rounded-lg shadow-lg w-full max-w-md"
@@ -132,7 +115,7 @@ const Login: React.FC = () => {
             />
             <button
               type="submit"
-              className="w-full bg-customLime hover:bg-customLimeHover text-white font-semibold p-3 rounded-lg transition-colors duration-300"
+              className="w-full bg-customLime hover:bg-customLimeHover font-semibold p-3 rounded-lg transition-colors duration-300"
             >
               {authButtonText}
             </button>
@@ -147,7 +130,6 @@ const Login: React.FC = () => {
               </button>
             </p>
           </form>
-        )}
       </div>
     </>
   );
