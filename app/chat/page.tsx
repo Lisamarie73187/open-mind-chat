@@ -1,9 +1,9 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import AvatarOne from "../../assets/avatarOne.png";
-import AvatarTwo from "../../assets/avatarTwo.png";
-import { firstWelcomeChat } from "../api/botSystemRole";
+'use client';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import AvatarOne from '../../assets/avatarOne.png';
+import AvatarTwo from '../../assets/avatarTwo.png';
+import { firstWelcomeChat } from '../api/botSystemRole';
 
 interface MessageObj {
   message: string;
@@ -12,7 +12,7 @@ interface MessageObj {
 }
 
 const Chat: React.FC = () => {
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>('');
   const [messages, setMessages] = useState<MessageObj[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [botTyping, setBotTyping] = useState<boolean>(false); // New state for typing indicator
@@ -25,7 +25,7 @@ const Chat: React.FC = () => {
           {
             message: firstWelcomeChat,
             timestamp: new Date().toString(),
-            role: "therapist",
+            role: 'therapist',
           },
         ]);
       } catch (error) {
@@ -47,10 +47,10 @@ const Chat: React.FC = () => {
       const newMessage: MessageObj = {
         message,
         timestamp: new Date().toString(),
-        role: "user",
+        role: 'user',
       };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setMessage("");
+      setMessage('');
 
       setBotTyping(true);
       setLoading(true);
@@ -62,10 +62,14 @@ const Chat: React.FC = () => {
           setBotTyping(false);
           setMessages((prevMessages) => [
             ...prevMessages,
-            { message: responseMessage, timestamp: new Date().toString(), role: "therapist" },
+            {
+              message: responseMessage,
+              timestamp: new Date().toString(),
+              role: 'therapist',
+            },
           ]);
           setLoading(false);
-        }, 1500); 
+        }, 1500);
       } catch (error) {
         console.error(error);
         setBotTyping(false);
@@ -75,10 +79,10 @@ const Chat: React.FC = () => {
   };
 
   const getAIResponse = async (userMessageObj: MessageObj) => {
-    const response = await fetch("/api/chat", {
-      method: "POST",
+    const response = await fetch('/api/chat', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(userMessageObj),
     });
@@ -91,30 +95,30 @@ const Chat: React.FC = () => {
     <div className="min-h-screen flex justify-center bg-custom p-4">
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
-        {botTyping && (
-          <div className="flex justify-start items-center space-x-2 mt-2">
-          <Image
-            src={AvatarOne}
-            alt="Bot Avatar"
-            width={40}
-            height={40}
-            className="rounded-full border border-gray-300"
-            />
-            <div className="typing-indicator flex space-x-1">
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
+          {botTyping && (
+            <div className="flex justify-start items-center space-x-2 mt-2">
+              <Image
+                src={AvatarOne}
+                alt="Bot Avatar"
+                width={40}
+                height={40}
+                className="rounded-full border border-gray-300"
+              />
+              <div className="typing-indicator flex space-x-1">
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
           {[...messages].reverse().map((msg, index) => (
             <div
               key={index}
               className={`flex ${
-                msg.role === "user" ? "justify-end" : "justify-start"
+                msg.role === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
-              {msg.role === "user" ? (
+              {msg.role === 'user' ? (
                 <div className="flex items-start space-x-3">
                   <div className="bg-cyan-500 text-white p-3 rounded-lg shadow-md max-w-lg text-md">
                     {msg.message}
@@ -141,17 +145,15 @@ const Chat: React.FC = () => {
                   </div>
                 </div>
               )}
-              
             </div>
           ))}
-          
         </div>
         <footer className="bg-white p-3 shadow-md flex items-center rounded-xl">
           <input
             type="text"
             value={message}
             onChange={handleMessageInput}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Type your message..."
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 mr-4 focus:outline-none focus:border-cyan-500"
           />
@@ -159,7 +161,7 @@ const Chat: React.FC = () => {
             onClick={sendMessage}
             disabled={loading}
             className={`${
-              loading ? "bg-gray-500" : "bg-cyan-500 hover:bg-cyan-700"
+              loading ? 'bg-gray-500' : 'bg-cyan-500 hover:bg-cyan-700'
             } text-white px-4 py-2 rounded-lg`}
           >
             Send

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import "./globals.css";
-import { Open_Sans } from "next/font/google";
-import { UserProvider } from "./context/userContext";
+import './globals.css';
+import { Open_Sans } from 'next/font/google';
+import { UserProvider } from './context/userContext';
 
 const openSans = Open_Sans({
-  subsets: ["latin"],
-  weight: ["300", "800"],
+  subsets: ['latin'],
+  weight: ['300', '800'],
 });
 
 export default function RootLayout({

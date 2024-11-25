@@ -1,5 +1,13 @@
-"use client";
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+'use client';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  ReactNode,
+} from 'react';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 
@@ -37,7 +45,10 @@ const fetchUserData = async (uid: string) => {
       const data = await response.json();
       return data.user;
     } else {
-      console.error('Error fetching additional user data:', response.statusText);
+      console.error(
+        'Error fetching additional user data:',
+        response.statusText,
+      );
       return null;
     }
   } catch (error) {
@@ -51,25 +62,33 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        const { uid } = firebaseUser;
-        const userData = await fetchUserData(uid);
-        setUser(userData);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser: FirebaseUser | null) => {
+        if (firebaseUser) {
+          const { uid } = firebaseUser;
+          const userData = await fetchUserData(uid);
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      },
+    );
 
     return () => unsubscribe();
   }, [fetchUserData]);
 
-  const contextValue = useMemo(() => ({ user, setUser, loading }), [user, loading]);
+  const contextValue = useMemo(
+    () => ({
+      user,
+      setUser,
+      loading,
+    }),
+    [user, loading],
+  );
 
   return (
-    <UserContext.Provider value={contextValue}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
 };

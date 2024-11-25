@@ -1,14 +1,14 @@
-import React, { useCallback } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import React, { useCallback } from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
 const Logout: React.FC = () => {
   const handleLogout = useCallback(async () => {
     try {
       await signOut(auth);
-      console.log("User logged out successfully");
+      console.log('User logged out successfully');
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error('Error logging out:', error);
     }
   }, []);
 

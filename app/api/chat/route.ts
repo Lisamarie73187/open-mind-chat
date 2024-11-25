@@ -15,7 +15,14 @@ export async function POST(request: Request) {
   const messageObj: MessageObj = await request.json();
 
   if (!messageObj || !messageObj.message) {
-    return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: 'Message is required',
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   try {
@@ -31,7 +38,14 @@ export async function POST(request: Request) {
     });
 
     if (!apiUrl) {
-      return NextResponse.json({ error: 'API URL is not defined' }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: 'API URL is not defined',
+        },
+        {
+          status: 500,
+        },
+      );
     }
 
     const openaiResponse = await fetch(apiUrl, {
@@ -43,8 +57,14 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages: [
-          { role: 'system', content: botSystemRole },
-          { role: messageObj.role, content: messageObj.message },
+          {
+            role: 'system',
+            content: botSystemRole,
+          },
+          {
+            role: messageObj.role,
+            content: messageObj.message,
+          },
         ],
         max_tokens: 150,
         temperature: 0.8,
@@ -54,15 +74,30 @@ export async function POST(request: Request) {
     const data = await openaiResponse.json();
 
     if (openaiResponse.ok) {
-      return NextResponse.json({ response: data.choices[0].message.content });
+      return NextResponse.json({
+        response: data.choices[0].message.content,
+      });
     } else {
-      return NextResponse.json({ error: data.error.message }, { status: openaiResponse.status });
+      return NextResponse.json(
+        {
+          error: data.error.message,
+        },
+        {
+          status: openaiResponse.status,
+        },
+      );
     }
   } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+      },
+      {
+        status: 500,
+      },
+    );
   }
 }
-
 
 export async function GET() {
   try {
@@ -72,9 +107,23 @@ export async function GET() {
 
     const messages = await collection.find({}).toArray();
 
-    return NextResponse.json({ messages }, { status: 200 });
+    return NextResponse.json(
+      {
+        messages,
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.error('Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+      },
+      {
+        status: 500,
+      },
+    );
   }
 }
