@@ -4,6 +4,7 @@ import Image from 'next/image';
 import AvatarOne from '../../assets/avatarOne.png';
 import AvatarTwo from '../../assets/avatarTwo.png';
 import { firstWelcomeChat } from '../api/botSystemRole';
+import Logout from '../components/Logout';
 
 interface MessageObj {
   message: string;
@@ -93,6 +94,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className="min-h-screen flex justify-center bg-custom p-4">
+      <Logout />
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
           {botTyping && (
