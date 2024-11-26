@@ -12,6 +12,7 @@ const merriweather = Merriweather({
 
 export default function Welcome() {
   const router = useRouter();
+  const user = useUser();
 
   const handleChatNavigation = () => {
     router.push('/chat');
@@ -21,7 +22,7 @@ export default function Welcome() {
     <div className="flex flex-col flex-grow items-center pt-20 p-8 text-center">
       <Logout />
       <>
-          <h1 className="text-5xl text-cyan-900 mb-4">Welcome</h1>
+          <h1 className="text-5xl text-cyan-900 mb-4">Welcome {user.user?.name}</h1>
           <h2
             className={`${merriweather.className} text-7xl leading-tight max-w-xl text-cyan-900 mb-8`}
           >

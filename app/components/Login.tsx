@@ -6,10 +6,10 @@ import { auth } from '../../config/firebase';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
   updateProfile,
 } from 'firebase/auth';
 import { User } from '../api/users/route';
+import { useUser } from '../context/userContext';
 
 const Login: React.FC = () => {
   const [name, setName] = useState<string>('');
@@ -18,6 +18,8 @@ const Login: React.FC = () => {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const router = useRouter();
 
+  const { setUser } = useUser();
+
   const handleAuthAction = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -25,7 +27,7 @@ const Login: React.FC = () => {
         if (isSigningUp) {
           signUp();
         } else {
-          await signInWithEmailAndPassword(auth, email, password);
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
         }
       } catch (error) {
         alert(`Error: ${error}`);
@@ -54,10 +56,9 @@ const Login: React.FC = () => {
     } catch (error) {
       console.error('Error signing up:', error);
     }
-  } , [email, password, name]);
+  }, [email, password, name]);
 
   const addUser = useCallback(async (user: User) => {
-    console.log('Adding user:', user);
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
@@ -67,6 +68,10 @@ const Login: React.FC = () => {
         body: JSON.stringify(user),
       });
       const data = await response.json();
+      setUser({
+        ...user,
+        newUser: true,
+      });
       console.log('User added:', data);
     } catch (error) {
       console.error('Error adding user:', error);

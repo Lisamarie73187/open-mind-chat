@@ -4,7 +4,6 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useCallback,
   useMemo,
   ReactNode,
 } from 'react';
@@ -16,6 +15,7 @@ interface User {
   email: string | null;
   uid: string;
   loginTime: string;
+  newUser?: boolean;
 }
 
 interface UserContextType {
@@ -60,30 +60,21 @@ const fetchUserData = async (uid: string) => {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  console.log('UserProvider is called');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser: FirebaseUser | null) => {
-        console.log('onAuthStateChanged is called, firebaseUser:', firebaseUser);
         if (firebaseUser) {
           const { uid } = firebaseUser;
           const { creationTime, lastSignInTime } = firebaseUser.metadata;
   
           const isNewUser = creationTime === lastSignInTime;
-  
+   
           if (!isNewUser) {
             const userData = await fetchUserData(uid);
-            setUser(userData);
-          } else {
-            setUser({
-              uid,
-              name: firebaseUser.displayName || null,
-              email: firebaseUser.email || null,
-              loginTime: new Date().toISOString(),
-            });
-          }
+            setUser({...userData, newUser: false});
+          } 
         } else {
           setUser(null);
         }
@@ -92,7 +83,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     );
   
     return unsubscribe;
-  }, []);
+  }, [onAuthStateChanged]);
   
 
   const contextValue = useMemo(
