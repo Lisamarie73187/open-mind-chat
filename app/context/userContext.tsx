@@ -60,24 +60,40 @@ const fetchUserData = async (uid: string) => {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  console.log('UserProvider is called');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser: FirebaseUser | null) => {
+        console.log('onAuthStateChanged is called, firebaseUser:', firebaseUser);
         if (firebaseUser) {
           const { uid } = firebaseUser;
-          const userData = await fetchUserData(uid);
-          setUser(userData);
+          const { creationTime, lastSignInTime } = firebaseUser.metadata;
+  
+          const isNewUser = creationTime === lastSignInTime;
+  
+          if (!isNewUser) {
+            const userData = await fetchUserData(uid);
+            setUser(userData);
+          } else {
+            setUser({
+              uid,
+              name: firebaseUser.displayName || null,
+              email: firebaseUser.email || null,
+              loginTime: new Date().toISOString(),
+            });
+          }
         } else {
           setUser(null);
         }
         setLoading(false);
       },
     );
-
-    return () => unsubscribe();
-  }, [fetchUserData]);
+  
+    return unsubscribe;
+  }, []);
+  
 
   const contextValue = useMemo(
     () => ({

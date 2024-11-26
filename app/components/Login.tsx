@@ -23,21 +23,7 @@ const Login: React.FC = () => {
       e.preventDefault();
       try {
         if (isSigningUp) {
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password,
-          );
-          const newUser = userCredential.user;
-          await addUser({
-            name,
-            email,
-            loginTime: new Date().toISOString(),
-            uid: newUser.uid,
-          });
-          await updateProfile(newUser, {
-            displayName: name,
-          });
+          signUp();
         } else {
           await signInWithEmailAndPassword(auth, email, password);
         }
@@ -48,7 +34,30 @@ const Login: React.FC = () => {
     [isSigningUp, email, password, name, router],
   );
 
+  const signUp = useCallback(async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const newUser = userCredential.user;
+      await addUser({
+        name,
+        email,
+        loginTime: new Date().toISOString(),
+        uid: newUser.uid,
+      });
+      await updateProfile(newUser, {
+        displayName: name,
+      });
+    } catch (error) {
+      console.error('Error signing up:', error);
+    }
+  } , [email, password, name]);
+
   const addUser = useCallback(async (user: User) => {
+    console.log('Adding user:', user);
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
