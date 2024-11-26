@@ -5,8 +5,10 @@ import Logout from '../components/Logout';
 import ChatInput from './ChatInput';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
+import { useUser } from '../context/userContext';
 
 interface MessageObj {
+  userId?: string;
   message: string;
   timestamp: string;
   role: string;
@@ -17,6 +19,7 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<MessageObj[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [botTyping, setBotTyping] = useState<boolean>(false);
+  const user = useUser();
 
   useEffect(() => {
     const fetchInitialResponse = async () => {
@@ -46,6 +49,7 @@ const Chat: React.FC = () => {
   const sendMessage = async () => {
     if (message.trim()) {
       const userMessage: MessageObj = {
+        userId: user.user?.uid,
         message,
         timestamp: new Date().toString(),
         role: 'user',

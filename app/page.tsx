@@ -8,7 +8,6 @@ import Loading from './components/Loading';
 
 const Main: React.FC = () => {
   const user = useUser();
-  console.log({ user });
 
   if (user.loading) {
     return <Loading />;
