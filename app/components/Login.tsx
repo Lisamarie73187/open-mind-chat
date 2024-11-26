@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -12,31 +13,40 @@ import { User } from '../api/users/route';
 import { useUser } from '../context/userContext';
 
 const Login: React.FC = () => {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const [isSigningUp, setIsSigningUp] = useState(false);
+  const { setUser } = useUser();
   const router = useRouter();
 
-  const { setUser } = useUser();
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleAuthAction = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+  const addUserToDB = useCallback(
+    async (user: User) => {
       try {
-        if (isSigningUp) {
-          signUp();
-        } else {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        }
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(user),
+        });
+        const data = await response.json();
+        setUser({ ...user, newUser: true });
+        console.log('User added:', data);
       } catch (error) {
-        alert(`Error: ${error}`);
+        console.error('Error adding user:', error);
       }
     },
-    [isSigningUp, email, password, name, router],
+    [setUser],
   );
 
   const signUp = useCallback(async () => {
+    const { email, password, name } = formData;
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -44,39 +54,51 @@ const Login: React.FC = () => {
         password,
       );
       const newUser = userCredential.user;
-      await addUser({
+
+      await updateProfile(newUser, { displayName: name });
+      await addUserToDB({
         name,
         email,
         loginTime: new Date().toISOString(),
         uid: newUser.uid,
       });
-      await updateProfile(newUser, {
-        displayName: name,
-      });
+
+      router.push('/'); // Redirect after successful signup
     } catch (error) {
       console.error('Error signing up:', error);
     }
-  }, [email, password, name]);
+  }, [formData, addUserToDB, router]);
 
-  const addUser = useCallback(async (user: User) => {
+  const signIn = useCallback(async () => {
+    const { email, password } = formData;
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });
-      const data = await response.json();
-      setUser({
-        ...user,
-        newUser: true,
-      });
-      console.log('User added:', data);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      console.log('User signed in:', userCredential.user);
+      router.push('/');
     } catch (error) {
-      console.error('Error adding user:', error);
+      console.error('Error logging in:', error);
     }
-  }, []);
+  }, [formData, router]);
+
+  const handleAuthAction = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        if (isSigningUp) {
+          await signUp();
+        } else {
+          await signIn();
+        }
+      } catch (error) {
+        alert(`Error: ${error}`);
+      }
+    },
+    [isSigningUp, formData, signUp, signIn],
+  );
 
   const authButtonText = useMemo(
     () => (isSigningUp ? 'Sign Up' : 'Log In'),
@@ -106,27 +128,30 @@ const Login: React.FC = () => {
           </h2>
           {isSigningUp && (
             <input
+              name="name"
               type="text"
               placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={handleChange}
               className="border border-gray-300 p-3 rounded-lg mb-4 w-full focus:outline-none focus:border-cyan-500"
               required
             />
           )}
           <input
+            name="email"
             type="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             className="border border-gray-300 p-3 rounded-lg mb-4 w-full focus:outline-none focus:border-cyan-500"
             required
           />
           <input
+            name="password"
             type="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             className="border border-gray-300 p-3 rounded-lg mb-6 w-full focus:outline-none focus:border-cyan-500"
             required
           />
@@ -140,7 +165,7 @@ const Login: React.FC = () => {
             {switchText}{' '}
             <button
               type="button"
-              onClick={() => setIsSigningUp(() => !isSigningUp)}
+              onClick={() => setIsSigningUp((prev) => !prev)}
               className="text-cyan-700 font-semibold underline"
             >
               {toggleAuthModeText}

@@ -4,7 +4,7 @@ import { auth } from '../../config/firebase';
 import { useRouter } from 'next/navigation';
 
 const Logout: React.FC = () => {
-    const router = useRouter();
+  const router = useRouter();
 
   const handleLogout = useCallback(async () => {
     try {

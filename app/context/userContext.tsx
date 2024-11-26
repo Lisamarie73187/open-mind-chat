@@ -65,26 +65,27 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser: FirebaseUser | null) => {
+        console.log('firebaseUser:', firebaseUser);
         if (firebaseUser) {
           const { uid } = firebaseUser;
           const { creationTime, lastSignInTime } = firebaseUser.metadata;
-  
+
           const isNewUser = creationTime === lastSignInTime;
-   
+          console.log('isNewUser:', isNewUser);
+
           if (!isNewUser) {
             const userData = await fetchUserData(uid);
-            setUser({...userData, newUser: false});
-          } 
+            setUser({ ...userData, newUser: false });
+          }
         } else {
           setUser(null);
         }
         setLoading(false);
       },
     );
-  
-    return unsubscribe;
+
+    return () => unsubscribe();
   }, [onAuthStateChanged]);
-  
 
   const contextValue = useMemo(
     () => ({
