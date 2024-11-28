@@ -30,12 +30,11 @@ const Login: React.FC = () => {
   const addUserToDB = useCallback(
     async (user: User) => {
       try {
-        const response = await fetch('/api/users', {
+        fetch('/api/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(user),
         });
-        const data = await response.json();
         setUser({ ...user, newUser: true });
       } catch (error) {
         console.error('Error adding user:', error);

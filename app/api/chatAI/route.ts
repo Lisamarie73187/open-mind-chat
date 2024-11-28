@@ -6,7 +6,6 @@ const apiUrl = process.env.NEXT_PUBLIC_OPENAI_URL;
 
 export async function POST(request: Request) {
   const message: string = await request.json();
-  console.log('message:', message);
 
   if (!message) {
     return NextResponse.json({ error: 'Message is required' }, { status: 400 });

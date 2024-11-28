@@ -6,6 +6,7 @@ import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { useUser } from '../context/userContext';
 import { addMessageAndGetAIResponse, fetchAllMessages } from '../services/chat';
+import { firstWelcomeChat } from '../api/botSystemRole';
 
 interface MessageObj {
   userId: string;

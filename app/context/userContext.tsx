@@ -45,10 +45,6 @@ const fetchUserData = async (uid: string) => {
       const data = await response.json();
       return data.user;
     } else {
-      console.error(
-        'Error fetching additional user data:',
-        response.statusText,
-      );
       return null;
     }
   } catch (error) {
@@ -67,13 +63,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       async (firebaseUser: FirebaseUser | null) => {
         if (firebaseUser) {
           const { uid } = firebaseUser;
-          const { creationTime, lastSignInTime } = firebaseUser.metadata;
+          const userData = await fetchUserData(uid);
 
-          const isNewUser = creationTime === lastSignInTime;
-
-          if (!isNewUser) {
-            const userData = await fetchUserData(uid);
-            setUser({ ...userData, newUser: false });
+          if (userData) {
+            setUser(userData);
           }
         } else {
           setUser(null);
@@ -94,6 +87,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     [user, loading],
   );
 
+  console.log({user})
   return (
     <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
