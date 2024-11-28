@@ -1,14 +1,14 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { firstWelcomeChat } from '../api/botSystemRole';
+import React, { useState, useEffect, useCallback } from 'react';
 import Logout from '../components/Logout';
 import ChatInput from './ChatInput';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { useUser } from '../context/userContext';
+import { addMessageAndGetAIResponse, fetchAllMessages } from '../services/chat';
 
 interface MessageObj {
-  userId?: string;
+  userId: string;
   message: string;
   timestamp: string;
   role: string;
@@ -19,37 +19,36 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<MessageObj[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [botTyping, setBotTyping] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const user = useUser();
 
-  useEffect(() => {
-    const fetchInitialResponse = async () => {
-      setLoading(true);
-      try {
-        setMessages([
-          {
-            message: firstWelcomeChat,
-            timestamp: new Date().toString(),
-            role: 'therapist',
-          },
-        ]);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const userId = user.user?.uid || '';
 
-    fetchInitialResponse();
-  }, []);
+ 
+
+  const getMessages = useCallback(async (userId: string) => {
+    try {
+      const response = await fetchAllMessages(userId);
+      setMessages(response.reverse());
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+      setError('Failed to load messages.');
+    }
+  }, [userId]);
 
   const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
 
+  useEffect(() => {
+    if (userId) {
+      getMessages(userId);
+    }
+  }, [userId, getMessages]);
   const sendMessage = async () => {
     if (message.trim()) {
       const userMessage: MessageObj = {
-        userId: user.user?.uid,
+        userId: user.user?.uid || '',
         message,
         timestamp: new Date().toString(),
         role: 'user',
@@ -61,18 +60,15 @@ const Chat: React.FC = () => {
       setLoading(true);
 
       try {
-        const responseMessage = await getAIResponse(userMessage);
+        if(!user.user?.uid) {
+          return;
+        }
+        const chatBotResponse = await addMessageAndGetAIResponse(userMessage);
+        console.log({chatBotResponse});
 
         setTimeout(() => {
           setBotTyping(false);
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              message: responseMessage,
-              timestamp: new Date().toString(),
-              role: 'therapist',
-            },
-          ]);
+          setMessages((prevMessages) => [...prevMessages, chatBotResponse])
           setLoading(false);
         }, 1500);
       } catch (error) {
@@ -81,19 +77,6 @@ const Chat: React.FC = () => {
         setLoading(false);
       }
     }
-  };
-
-  const getAIResponse = async (userMessageObj: MessageObj) => {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userMessageObj),
-    });
-
-    const data = await response.json();
-    return data.response;
   };
 
   return (

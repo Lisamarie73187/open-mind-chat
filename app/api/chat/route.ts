@@ -27,13 +27,6 @@ export async function POST(request: Request) {
     const db = client.db('OpenMindChatCluter');
     const collection = db.collection('messages');
 
-    await collection.insertOne({
-      userId: messageObj.userId,
-      message: messageObj.message,
-      timestamp: new Date().toISOString(),
-      role: messageObj.role,
-    });
-
     if (!apiUrl) {
       return NextResponse.json(
         { error: 'API URL is not defined' },
@@ -96,4 +89,30 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+interface MessageInput {
+  conversationId: string;
+  userId: string;
+  senderId: string;
+  message: string;
+  role: string;
+}
+
+export async function addMessageWithUser(input: MessageInput) {
+  const client = await clientPromise;
+  const db = client.db('openMindChat');
+  const collection = db.collection('messages');
+
+  const messageDoc = {
+    conversationId: input.conversationId,
+    userId: input.userId,
+    senderId: input.senderId,
+    message: input.message,
+    timestamp: new Date().toISOString(),
+    role: input.role,
+  };
+
+  const result = await collection.insertOne(messageDoc);
+  return result.insertedId;
 }
