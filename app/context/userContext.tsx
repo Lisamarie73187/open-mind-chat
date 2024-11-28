@@ -87,7 +87,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     [user, loading],
   );
 
-  console.log({user})
+  console.log({ user });
   return (
     <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
