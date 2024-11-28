@@ -1,84 +1,13 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../lib/mongodb';
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import { getChatBotAI } from '../chatbot';
-import { time } from 'console';
 
 interface Message {
   userId: string;
   message: string;
   role: string;
-}
-
-export async function GET(
-  request: Request,
-  { params }: { params: { userId: string } },
-) {
-  const { userId } = params;
-
-  try {
-    const messages = await getMessagesByUser(userId);
-
-    return NextResponse.json({ messages }, { status: 200 });
-  } catch (error) {
-    console.error('Error during GET:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
-  }
-}
-
-export async function POST(
-  request: Request,
-  { params }: { params: { userId: string } },
-) {
-  const { userId } = params;
-
-  try {
-    const body = await request.json();
-    const { message, role } = body;
-
-    if (!userId || !message || !role) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 },
-      );
-    }
-
-    const messageObj = {
-      userId,
-      message,
-      role,
-      timestamp: new Date().toISOString(),
-    };
-
-    addMessage(messageObj);
-
-    const chatBotResponse = await getChatBotAI(message);
-
-    if ('error' in chatBotResponse) {
-      return NextResponse.json(
-        { error: chatBotResponse.error },
-        { status: 500 },
-      );
-    }
-    const chatBotObj = {
-      userId,
-      message: chatBotResponse.response,
-      role: 'assistant',
-      timestamp: new Date().toISOString(),
-    };
-    addMessage(chatBotObj);
-
-    return NextResponse.json({ chatBotObj }, { status: 201 });
-  } catch (error) {
-    console.error('Error during POST:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
-  }
+  timestamp: string;
 }
 
 const addMessage = async (messageObj: Message): Promise<ObjectId> => {
@@ -91,22 +20,95 @@ const addMessage = async (messageObj: Message): Promise<ObjectId> => {
     return result.insertedId;
   } catch (error) {
     console.error('Error adding message:', error);
-    throw new Error('Failed to add message');
+    throw new Error('Failed to add message to the database');
   }
 };
 
-export async function getMessagesByUser(userId: string): Promise<any[]> {
+const getMessagesByUser = async (userId: string): Promise<Message[]> => {
   try {
     const client = await clientPromise;
     const db = client.db('OpenMindChatCluter');
     const collection = db.collection('messages');
-
     const messages = await collection.find({ userId }).toArray();
-    console.log({ messages });
 
-    return messages;
+    return messages.map((message) => ({
+      userId: message.userId,
+      message: message.message,
+      role: message.role,
+      timestamp: message.timestamp,
+    }));
   } catch (error) {
     console.error('Error fetching messages:', error);
-    throw new Error('Internal server error'); // Throw an error to be handled by the caller
+    throw new Error('Failed to fetch messages');
+  }
+};
+
+const createErrorResponse = (message: string, status: number) =>
+  NextResponse.json({ error: message }, { status });
+
+export async function GET(
+  _request: Request,
+  { params }: { params: { userId: string } },
+) {
+  const { userId } = params;
+
+  if (!userId) {
+    return createErrorResponse('User ID is required', 400);
+  }
+
+  try {
+    const messages = await getMessagesByUser(userId);
+    return NextResponse.json({ messages }, { status: 200 });
+  } catch (error) {
+    return createErrorResponse('Internal server error', 500);
+  }
+}
+export async function POST(
+  request: Request,
+  { params }: { params: { userId: string } },
+) {
+  const { userId } = params;
+
+  if (!userId) {
+    return createErrorResponse('User ID is required', 400);
+  }
+
+  try {
+    const body = await request.json();
+    const { message, role } = body;
+
+    if (!message || !role) {
+      return createErrorResponse(
+        'Missing required fields: message or role',
+        400,
+      );
+    }
+
+    const userMessage: Message = {
+      userId,
+      message,
+      role,
+      timestamp: new Date().toISOString(),
+    };
+    await addMessage(userMessage);
+
+    const chatBotResponse = await getChatBotAI(message);
+
+    if ('error' in chatBotResponse) {
+      return createErrorResponse(chatBotResponse.error, 500);
+    }
+
+    const chatBotMessage: Message = {
+      userId,
+      message: chatBotResponse.response,
+      role: 'assistant',
+      timestamp: new Date().toISOString(),
+    };
+    await addMessage(chatBotMessage);
+
+    return NextResponse.json({ chatBotMessage }, { status: 201 });
+  } catch (error) {
+    console.error('Error during POST:', error);
+    return createErrorResponse('Internal server error', 500);
   }
 }

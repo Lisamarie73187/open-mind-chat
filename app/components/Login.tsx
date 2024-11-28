@@ -37,7 +37,6 @@ const Login: React.FC = () => {
         });
         const data = await response.json();
         setUser({ ...user, newUser: true });
-        console.log('User added:', data);
       } catch (error) {
         console.error('Error adding user:', error);
       }
@@ -63,7 +62,7 @@ const Login: React.FC = () => {
         uid: newUser.uid,
       });
 
-      router.push('/'); // Redirect after successful signup
+      router.push('/');
     } catch (error) {
       console.error('Error signing up:', error);
     }

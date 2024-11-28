@@ -24,19 +24,25 @@ const Chat: React.FC = () => {
 
   const userId = user.user?.uid || '';
 
-  const getMessages = useCallback(async (userId: string) => {
-    try {
-      const response = await fetchAllMessages(userId);
-      setMessages(response.reverse());
-    } catch (err) {
-      console.error('Error fetching messages:', err);
-      setError('Failed to load messages.');
-    }
-  }, [userId]);
+  const getMessages = useCallback(
+    async (userId: string) => {
+      try {
+        const response = await fetchAllMessages(userId);
+        setMessages(response.reverse());
+      } catch (err) {
+        console.error('Error fetching messages:', err);
+        setError('Failed to load messages.');
+      }
+    },
+    [userId],
+  );
 
-  const handleMessageInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-  }, []);
+  const handleMessageInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setMessage(e.target.value);
+    },
+    [],
+  );
 
   const sendMessage = useCallback(async () => {
     if (!message.trim() || !userId) return;
@@ -71,13 +77,16 @@ const Chat: React.FC = () => {
     }
   }, [userId, getMessages]);
 
-  const renderedMessages = useMemo(() => messages.map((msg, index) => (
-    <MessageBubble key={index} message={msg} />
-  )), [messages]);
+  const renderedMessages = useMemo(
+    () =>
+      messages.map((msg, index) => <MessageBubble key={index} message={msg} />),
+    [messages],
+  );
 
   return (
     <div className="min-h-screen flex justify-center bg-custom p-4">
       <Logout />
+      {error && <div className="text-red-500">{error}</div>}
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
           {botTyping && <TypingIndicator />}
