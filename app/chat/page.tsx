@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Logout from '../components/Logout';
 import ChatInput from './ChatInput';
 import MessageBubble from './MessageBubble';
@@ -24,8 +24,6 @@ const Chat: React.FC = () => {
 
   const userId = user.user?.uid || '';
 
- 
-
   const getMessages = useCallback(async (userId: string) => {
     try {
       const response = await fetchAllMessages(userId);
@@ -36,48 +34,46 @@ const Chat: React.FC = () => {
     }
   }, [userId]);
 
-  const handleMessageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMessageInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
-  };
+  }, []);
+
+  const sendMessage = useCallback(async () => {
+    if (!message.trim() || !userId) return;
+
+    const userMessage: MessageObj = {
+      userId,
+      message,
+      timestamp: new Date().toString(),
+      role: 'user',
+    };
+    setMessages((prevMessages) => [userMessage, ...prevMessages]);
+    setMessage('');
+
+    setBotTyping(true);
+    setLoading(true);
+
+    try {
+      const chatBotResponse = await addMessageAndGetAIResponse(userMessage);
+      setMessages((prevMessages) => [chatBotResponse, ...prevMessages]);
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setError('Failed to send message.');
+    } finally {
+      setBotTyping(false);
+      setLoading(false);
+    }
+  }, [message, userId]);
 
   useEffect(() => {
     if (userId) {
       getMessages(userId);
     }
   }, [userId, getMessages]);
-  const sendMessage = async () => {
-    if (message.trim()) {
-      const userMessage: MessageObj = {
-        userId: user.user?.uid || '',
-        message,
-        timestamp: new Date().toString(),
-        role: 'user',
-      };
-      setMessages((prevMessages) => [...prevMessages, userMessage]);
-      setMessage('');
 
-      setBotTyping(true);
-      setLoading(true);
-
-      try {
-        if(!user.user?.uid) {
-          return;
-        }
-        const chatBotResponse = await addMessageAndGetAIResponse(userMessage);
-        console.log({chatBotResponse});
-
-        setTimeout(() => {
-          setBotTyping(false);
-          setMessages((prevMessages) => [...prevMessages, chatBotResponse])
-          setLoading(false);
-        }, 1500);
-      } catch (error) {
-        console.error(error);
-        setBotTyping(false);
-        setLoading(false);
-      }
-    }
-  };
+  const renderedMessages = useMemo(() => messages.map((msg, index) => (
+    <MessageBubble key={index} message={msg} />
+  )), [messages]);
 
   return (
     <div className="min-h-screen flex justify-center bg-custom p-4">
@@ -85,9 +81,7 @@ const Chat: React.FC = () => {
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
           {botTyping && <TypingIndicator />}
-          {[...messages].reverse().map((msg, index) => (
-            <MessageBubble key={index} message={msg} />
-          ))}
+          {renderedMessages}
         </div>
         <ChatInput
           message={message}

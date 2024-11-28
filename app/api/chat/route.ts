@@ -16,10 +16,7 @@ export async function POST(request: Request) {
   const messageObj: MessageObj = await request.json();
 
   if (!messageObj || !messageObj.message) {
-    return NextResponse.json(
-      { error: 'Message is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Message is required' }, { status: 400 });
   }
 
   try {
@@ -30,7 +27,7 @@ export async function POST(request: Request) {
     if (!apiUrl) {
       return NextResponse.json(
         { error: 'API URL is not defined' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -58,14 +55,14 @@ export async function POST(request: Request) {
     } else {
       return NextResponse.json(
         { error: data.error.message },
-        { status: openaiResponse.status }
+        { status: openaiResponse.status },
       );
     }
   } catch (error) {
     console.error('Error during POST:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -78,15 +75,12 @@ export async function GET() {
 
     const messages = await collection.find({}).toArray();
 
-    return NextResponse.json(
-      { messages },
-      { status: 200 }
-    );
+    return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     console.error('Error during GET:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

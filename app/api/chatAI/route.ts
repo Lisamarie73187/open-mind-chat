@@ -9,17 +9,14 @@ export async function POST(request: Request) {
   console.log('message:', message);
 
   if (!message) {
-    return NextResponse.json(
-      { error: 'Message is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Message is required' }, { status: 400 });
   }
 
   try {
     if (!apiUrl) {
       return NextResponse.json(
         { error: 'API URL is not defined' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -47,14 +44,14 @@ export async function POST(request: Request) {
     } else {
       return NextResponse.json(
         { error: data.error.message },
-        { status: openaiResponse.status }
+        { status: openaiResponse.status },
       );
     }
   } catch (error) {
     console.error('Error during POST:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

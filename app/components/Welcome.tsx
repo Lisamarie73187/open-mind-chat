@@ -27,12 +27,14 @@ const Welcome: React.FC = () => {
       </h2>
       <div className="text-2xl text-cyan-900 max-w-2xl mb-20">
         <p className="mb-6">
-          Welcome to Open Mind Chat, your personal companion for moments of connection and self-discovery.
-          Whether you're seeking a moment of peace, a compassionate listener, or a safe space to express
-          your thoughts, you're in the right place.
+          Welcome to Open Mind Chat, your personal companion for moments of
+          connection and self-discovery. Whether you're seeking a moment of
+          peace, a compassionate listener, or a safe space to express your
+          thoughts, you're in the right place.
         </p>
         <p className="mb-6">
-          <span className="font-bold">Ami</span> is here to listen and offer support.
+          <span className="font-bold">Ami</span> is here to listen and offer
+          support.
         </p>
       </div>
       <button

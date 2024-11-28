@@ -3,7 +3,9 @@ import { botSystemRole } from '../botSystemRole';
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
 const apiUrl = process.env.NEXT_PUBLIC_OPENAI_URL;
 
-export async function getChatBotAI(message: string): Promise<{ response: string } | { error: string }> {
+export async function getChatBotAI(
+  message: string,
+): Promise<{ response: string } | { error: string }> {
   console.log('message:', message);
 
   if (!message) {
