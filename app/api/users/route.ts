@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     const user = await usersCollection.findOne({ uid });
 
     if (!user) {
-      return null;
+      return NextResponse.json({ user }, { status: 200 });
     }
 
     return NextResponse.json({ user }, { status: 200 });

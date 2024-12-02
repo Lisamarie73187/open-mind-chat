@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '../../../lib/mongodb';
+import clientPromise from '../../lib/mongodb';
 import { ObjectId, WithId } from 'mongodb';
-import { getChatBotAI } from '../chatbot';
-import { firstWelcomeChat } from '../../botSystemRole';
+import { getChatBotAI } from './chatbot';
+import { firstWelcomeChat } from '../botSystemRole';
 
 interface Message {
   userId: string;
@@ -25,12 +25,18 @@ const addMessage = async (messageObj: Message): Promise<ObjectId> => {
   }
 };
 
-const getMessagesByUser = async (userId: string): Promise<Message[]> => {
+const getMessagesByUser = async (userId: string, lastTimestamp?: string, limit = 20): Promise<Message[]> => {
   try {
     const client = await clientPromise;
     const db = client.db('OpenMindChatCluter');
     const collection = db.collection('messages');
-    const messages = await collection.find({ userId }).toArray();
+
+    const messages = await collection
+    .find({ userId })
+    .sort({ timestamp: -1 }) 
+    .limit(limit)
+    .toArray();
+
     console.log('messages:', messages);
 
     const welcomeMessage: Message = {
@@ -60,17 +66,20 @@ const createErrorResponse = (message: string, status: number) =>
   NextResponse.json({ error: message }, { status });
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { userId: string } },
+  _request: Request
 ) {
-  const { userId } = params;
+  const { searchParams } = new URL(_request.url);
+  const userId = searchParams.get('userId');
+  const limit = searchParams.get('limit') || undefined;
+  const lastTimestamp = searchParams.get('timestamp') || undefined;
+  console.log('userId:', searchParams);
 
   if (!userId) {
     return createErrorResponse('User ID is required', 400);
   }
 
   try {
-    const messages = await getMessagesByUser(userId);
+    const messages = await getMessagesByUser(userId, lastTimestamp, Number(limit));
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     return createErrorResponse('Internal server error', 500);

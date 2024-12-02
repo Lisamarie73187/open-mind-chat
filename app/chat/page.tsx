@@ -6,7 +6,6 @@ import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import { useUser } from '../context/userContext';
 import { addMessageAndGetAIResponse, fetchAllMessages } from '../services/chat';
-import { firstWelcomeChat } from '../api/botSystemRole';
 
 interface MessageObj {
   userId: string;
@@ -25,10 +24,10 @@ const Chat: React.FC = () => {
 
   const userId = user.user?.uid || '';
 
-  const getMessages = useCallback(
-    async (userId: string) => {
+  const loadMessages = useCallback(
+    async (userId: string, lastTimeStamp?: string) => {
       try {
-        const response = await fetchAllMessages(userId);
+        const response = await fetchAllMessages(userId, lastTimeStamp);
         setMessages(response.reverse());
       } catch (err) {
         console.error('Error fetching messages:', err);
@@ -74,9 +73,9 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (userId) {
-      getMessages(userId);
+      loadMessages(userId);
     }
-  }, [userId, getMessages]);
+  }, [userId, loadMessages]);
 
   const renderedMessages = useMemo(
     () =>

@@ -33,10 +33,10 @@ export const getChatAIResponse = async (
   }
 };
 
-export const fetchAllMessages = async (userId: string): Promise<Message[]> => {
+export const fetchAllMessages = async (userId: string, lastTimestamp: string | null = null, limit = 20): Promise<Message[]> => {
   try {
     const response = await apiClient.get<{ messages: Message[] }>(
-      `/messages/${userId}`,
+      `/messages?userId=${userId}&lastTimestamp=${lastTimestamp}&limit=${limit}`,
     );
     return response.data.messages;
   } catch (error: any) {
