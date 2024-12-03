@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../lib/mongodb';
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { getChatBotAI } from './chatbot';
 import { firstWelcomeChat } from '../botSystemRole';
 
@@ -9,6 +9,7 @@ interface Message {
   message: string;
   role: string;
   timestamp: string;
+  _id?: ObjectId | undefined;
 }
 
 const addMessage = async (messageObj: Message): Promise<ObjectId> => {
@@ -25,28 +26,36 @@ const addMessage = async (messageObj: Message): Promise<ObjectId> => {
   }
 };
 
-const getMessagesByUser = async (userId: string, lastTimestamp?: string, limit = 20): Promise<Message[]> => {
+const getMessagesByUser = async (
+  userId: string,
+  lastId?: string,
+  limit = 20,
+): Promise<Message[]> => {
   try {
     const client = await clientPromise;
     const db = client.db('OpenMindChatCluter');
     const collection = db.collection('messages');
 
+    const query: Record<string, any> = { userId };
+    if (lastId) {
+      query._id = { $lt: new ObjectId(lastId) };
+    }
+
     const messages = await collection
-    .find({ userId })
-    .sort({ timestamp: -1 }) 
-    .limit(limit)
-    .toArray();
+      .find(query)
+      .sort({ _id: -1 })
+      .limit(limit)
+      .toArray();
 
-    console.log('messages:', messages);
-
-    const welcomeMessage: Message = {
-      userId,
-      message: firstWelcomeChat,
-      role: 'assistant',
-      timestamp: new Date().toISOString(),
-    };
     if (messages.length === 0) {
-      addMessage(welcomeMessage);
+      const welcomeMessage: Message = {
+        userId,
+        message: firstWelcomeChat,
+        role: 'assistant',
+        timestamp: new Date().toISOString(),
+      };
+
+      await addMessage(welcomeMessage);
       return [welcomeMessage];
     }
 
@@ -55,6 +64,7 @@ const getMessagesByUser = async (userId: string, lastTimestamp?: string, limit =
       message: message.message,
       role: message.role,
       timestamp: message.timestamp,
+      _id: message._id,
     }));
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -62,41 +72,42 @@ const getMessagesByUser = async (userId: string, lastTimestamp?: string, limit =
   }
 };
 
+
 const createErrorResponse = (message: string, status: number) =>
   NextResponse.json({ error: message }, { status });
 
-export async function GET(
-  _request: Request
-) {
+export async function GET(_request: Request) {
   const { searchParams } = new URL(_request.url);
   const userId = searchParams.get('userId');
   const limit = searchParams.get('limit') || undefined;
-  const lastTimestamp = searchParams.get('timestamp') || undefined;
-  console.log('userId:', searchParams);
+  const lastId = searchParams.get('lastId') || undefined;
 
   if (!userId) {
     return createErrorResponse('User ID is required', 400);
   }
 
   try {
-    const messages = await getMessagesByUser(userId, lastTimestamp, Number(limit));
+    const messages = await getMessagesByUser(
+      userId,
+      lastId,
+      Number(limit),
+    );
+    console.log('messages: 123', messages[0]);
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     return createErrorResponse('Internal server error', 500);
   }
 }
-export async function POST(
-  request: Request,
-  { params }: { params: { userId: string } },
-) {
-  const { userId } = params;
+export async function POST(_request: Request) {
+  const { searchParams } = new URL(_request.url);
+  const userId = searchParams.get('userId');
 
   if (!userId) {
     return createErrorResponse('User ID is required', 400);
   }
 
   try {
-    const body = await request.json();
+    const body = await _request.json();
     const { message, role } = body;
 
     if (!message || !role) {

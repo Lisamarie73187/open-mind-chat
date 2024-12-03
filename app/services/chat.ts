@@ -9,6 +9,7 @@ interface Message {
   message: string;
   timestamp: string;
   role: string;
+  _id?: string;
 }
 
 const apiClient = axios.create({
@@ -33,11 +34,25 @@ export const getChatAIResponse = async (
   }
 };
 
-export const fetchAllMessages = async (userId: string, lastTimestamp: string | null = null, limit = 20): Promise<Message[]> => {
+export const fetchAllMessages = async (
+  userId: string,
+  lastId?: string,
+  limit = 10,
+): Promise<Message[]> => {
   try {
+    const queryParams = new URLSearchParams({
+      userId,
+      limit: limit.toString(),
+    });
+
+    if (lastId) {
+      queryParams.append('lastId', lastId);
+    }
+
     const response = await apiClient.get<{ messages: Message[] }>(
-      `/messages?userId=${userId}&lastTimestamp=${lastTimestamp}&limit=${limit}`,
+      `/messages?${queryParams.toString()}`,
     );
+    console.log('response:', response);
     return response.data.messages;
   } catch (error: any) {
     console.error(
@@ -53,7 +68,7 @@ export const addMessageAndGetAIResponse = async (
 ): Promise<Message> => {
   try {
     const response = await apiClient.post<{ chatBotMessage: Message }>(
-      `/messages/${message.userId}`,
+      `/messages?userId=${message.userId}`,
       message,
     );
     return response.data.chatBotMessage;

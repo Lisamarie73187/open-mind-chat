@@ -1,5 +1,10 @@
 'use client';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import Logout from '../components/Logout';
 import ChatInput from './ChatInput';
 import MessageBubble from './MessageBubble';
@@ -20,15 +25,21 @@ const Chat: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [botTyping, setBotTyping] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [messageId, setMessageId] = useState<string | undefined>(undefined);
+
   const user = useUser();
 
   const userId = user.user?.uid || '';
 
   const loadMessages = useCallback(
-    async (userId: string, lastTimeStamp?: string) => {
+    async (userId: string, lastId?: string) => {
       try {
-        const response = await fetchAllMessages(userId, lastTimeStamp);
-        setMessages(response.reverse());
+        const response = await fetchAllMessages(userId, lastId);
+        if (response.length > 0) {
+          setMessages((prevMessages) => [...prevMessages, ...response]);
+          setMessageId(response[response.length - 1]._id);
+        }
       } catch (err) {
         console.error('Error fetching messages:', err);
         setError('Failed to load messages.');
@@ -36,6 +47,12 @@ const Chat: React.FC = () => {
     },
     [userId],
   );
+
+  const loadMoreMessages = useCallback(async () => {
+    setLoadingMore(true);
+    await loadMessages(userId, messageId);
+    setLoadingMore(false);
+  }, [userId, loadMessages, messageId]);
 
   const handleMessageInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +67,7 @@ const Chat: React.FC = () => {
     const userMessage: MessageObj = {
       userId,
       message,
-      timestamp: new Date().toString(),
+      timestamp: new Date().toISOString(),
       role: 'user',
     };
     setMessages((prevMessages) => [userMessage, ...prevMessages]);
@@ -88,9 +105,20 @@ const Chat: React.FC = () => {
       <Logout />
       {error && <div className="text-red-500">{error}</div>}
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
+     
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
+          
           {botTyping && <TypingIndicator />}
           {renderedMessages}
+          <div className="flex flex-col items-center p-4">
+          <button
+            className="text-white bg-blue-500 hover:bg-blue-600 font-medium py-2 px-4 rounded"
+            onClick={loadMoreMessages}
+            disabled={loadingMore}
+          >
+            {loadingMore ? 'Loading...' : 'Load More Messages'}
+          </button>
+        </div>
         </div>
         <ChatInput
           message={message}
