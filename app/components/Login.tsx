@@ -70,12 +70,11 @@ const Login: React.FC = () => {
   const signIn = useCallback(async () => {
     const { email, password } = formData;
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         email,
         password,
       );
-      console.log('User signed in:', userCredential.user);
       router.push('/');
     } catch (error) {
       console.error('Error logging in:', error);

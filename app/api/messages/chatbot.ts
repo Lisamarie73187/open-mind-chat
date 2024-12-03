@@ -6,7 +6,6 @@ const apiUrl = process.env.NEXT_PUBLIC_OPENAI_URL;
 export async function getChatBotAI(
   message: string,
 ): Promise<{ response: string } | { error: string }> {
-  console.log('message:', message);
 
   if (!message) {
     return { error: 'Message is required' };
