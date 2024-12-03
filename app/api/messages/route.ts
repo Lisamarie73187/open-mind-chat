@@ -72,7 +72,6 @@ const getMessagesByUser = async (
   }
 };
 
-
 const createErrorResponse = (message: string, status: number) =>
   NextResponse.json({ error: message }, { status });
 
@@ -87,12 +86,7 @@ export async function GET(_request: Request) {
   }
 
   try {
-    const messages = await getMessagesByUser(
-      userId,
-      lastId,
-      Number(limit),
-    );
-    console.log('messages: 123', messages[0]);
+    const messages = await getMessagesByUser(userId, lastId, Number(limit));
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     return createErrorResponse('Internal server error', 500);

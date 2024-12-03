@@ -1,10 +1,5 @@
 'use client';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Logout from '../components/Logout';
 import ChatInput from './ChatInput';
 import MessageBubble from './MessageBubble';
@@ -105,20 +100,18 @@ const Chat: React.FC = () => {
       <Logout />
       {error && <div className="text-red-500">{error}</div>}
       <div className="w-full lg:max-w-4xl md:max-w-xl sm:max-w-md bg-purple-50 rounded-xl shadow-lg flex flex-col h-[80vh]">
-     
         <div className="flex-1 overflow-y-auto p-6 flex flex-col-reverse space-y-reverse space-y-4">
-          
           {botTyping && <TypingIndicator />}
           {renderedMessages}
           <div className="flex flex-col items-center p-4">
-          <button
-            className="text-white bg-blue-500 hover:bg-blue-600 font-medium py-2 px-4 rounded"
-            onClick={loadMoreMessages}
-            disabled={loadingMore}
-          >
-            {loadingMore ? 'Loading...' : 'Load More Messages'}
-          </button>
-        </div>
+            <button
+              className={`text-cyan-500 font-bold font-small py-2 px-4 rounded transform transition-transform duration-200 hover:scale-105`}
+              onClick={loadMoreMessages}
+              disabled={loadingMore}
+            >
+              {loadingMore ? 'Loading...' : 'Load More Messages'}
+            </button>
+          </div>
         </div>
         <ChatInput
           message={message}

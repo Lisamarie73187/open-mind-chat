@@ -52,7 +52,6 @@ export const fetchAllMessages = async (
     const response = await apiClient.get<{ messages: Message[] }>(
       `/messages?${queryParams.toString()}`,
     );
-    console.log('response:', response);
     return response.data.messages;
   } catch (error: any) {
     console.error(
