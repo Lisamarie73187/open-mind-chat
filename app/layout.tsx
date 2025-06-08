@@ -1,14 +1,9 @@
 'use client';
 
 import './globals.css';
-import { Open_Sans } from 'next/font/google';
-import { UserProvider } from './context/userContext';
+// import { UserProvider } from './context/userContext';
 import Footer from './components/Footer';
-
-const openSans = Open_Sans({
-	subsets: ['latin'],
-	weight: ['300', '800'],
-});
+import HeaderBanner from './components/HeaderBanner';
 
 export default function RootLayout({
 	children,
@@ -18,20 +13,10 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className="min-h-screen antialiased bg-custom flex flex-col">
-				<div className="p-2 self-start w-full flex justify-between items-center">
-					<div>
-						<div
-							className={`${openSans.className} font-bold text-[20px] px-2 text-cyan-900`}
-						>
-							+ Open Mind Chat
-						</div>
-						<div className="italic text-[16px] px-2 text-cyan-900">
-							A Space for Mindful Conversations
-						</div>
-					</div>
-				</div>
-				<UserProvider>{children}</UserProvider>
-				<Footer/>
+				<HeaderBanner />
+				{children}
+				{/* <UserProvider>{children}</UserProvider> */}
+				<Footer />
 			</body>
 		</html>
 	);

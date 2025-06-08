@@ -1,15 +1,18 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import PageLayout from './ui/Containers/PageLayout';
-import BoxContainer from './ui/Containers/BoxContainer';
-import Form from './ui/Form';
-import Button from './ui/Buttons/Button';
-import Header from './ui/Text/Header';
-import Input from './ui/Input';
-import BodyText from './ui/Text/BodyText';
-import LinkButton from './ui/Buttons/LinkButton';
-import HorizontalContainer from './ui/Containers/HorizontalContainer';
+import {
+	PageLayout,
+	BoxContainer,
+	Form,
+	Button,
+	Header,
+	Input,
+	BodyText,
+	LinkButton,
+	HorizontalContainer,
+} from '../components/ui';
+
 import { useAuth } from '../hooks/useAuth';
 
 const Login: React.FC = () => {

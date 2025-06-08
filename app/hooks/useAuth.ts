@@ -1,15 +1,17 @@
 // hooks/useAuth.ts
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 	updateProfile,
+	onAuthStateChanged,
+	signOut as firebaseSignOut,
+	User as FirebaseUser,
 } from 'firebase/auth';
 
 import { auth } from '../../config/firebase';
-import { useUser } from '../context/userContext';
-import { User } from '../api/users/route';
+import { useUser } from '../hooks/useUser';
 
 type FormData = {
 	name: string;
@@ -19,23 +21,18 @@ type FormData = {
 
 export const useAuth = () => {
 	const router = useRouter();
-	const { setUser } = useUser();
+	const { createUser, fetchUser } = useUser();
 
-	const addUserToDB = useCallback(
-		async (user: User) => {
-			try {
-				fetch('/api/users', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(user),
-				});
-				setUser({ ...user, newUser: true });
-			} catch (error) {
-				console.error('Error adding user:', error);
-			}
-		},
-		[setUser],
-	);
+	const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const unsubscribe = onAuthStateChanged(auth, async (user) => {
+			setCurrentUser(user);
+			setLoading(false);
+		});
+		return unsubscribe;
+	}, [fetchUser]);
 
 	const signUp = useCallback(
 		async (formData: FormData) => {
@@ -49,19 +46,17 @@ export const useAuth = () => {
 				const newUser = userCredential.user;
 
 				await updateProfile(newUser, { displayName: name });
-				await addUserToDB({
+				await createUser({
 					name,
 					email,
-					loginTime: new Date().toISOString(),
 					uid: newUser.uid,
 				});
-
 				router.push('/');
 			} catch (error) {
 				console.error('Error signing up:', error);
 			}
 		},
-		[addUserToDB, router],
+		[createUser, router],
 	);
 
 	const signIn = useCallback(
@@ -77,5 +72,15 @@ export const useAuth = () => {
 		[router],
 	);
 
-	return { signUp, signIn };
+	const signOut = useCallback(async () => {
+		try {
+			await firebaseSignOut(auth);
+			setCurrentUser(null);
+			router.push('/login');
+		} catch (error) {
+			console.error('Error signing out:', error);
+		}
+	}, [router]);
+
+	return { signUp, signIn, signOut, currentUser, loading };
 };

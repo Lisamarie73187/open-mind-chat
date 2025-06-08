@@ -1,27 +1,28 @@
 import React, { useCallback } from 'react';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../config/firebase';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../hooks/useAuth';
+import { Button } from './ui';
 
 const Logout: React.FC = () => {
 	const router = useRouter();
+	const { signOut } = useAuth();
 
 	const handleLogout = useCallback(async () => {
 		try {
-			await signOut(auth);
+			await signOut();
 			router.push('/');
 		} catch (error) {
 			console.error('Error logging out:', error);
 		}
-	}, []);
+	}, [router, signOut]);
 
 	return (
-		<button
+		<Button
 			onClick={handleLogout}
-			className="absolute top-4 right-4 px-4 py-2 text-sm bg-customLime hover:bg-customLimeHover rounded"
-		>
-			Logout
-		</button>
+			text='Logout'
+			className="absolute top-4 w-32 right-4 px-4 py-2 text-sm bg-customLime hover:bg-customLimeHover rounded"
+		/>
+
 	);
 };
 
