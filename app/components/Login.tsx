@@ -54,7 +54,7 @@ const Login: React.FC = () => {
 	}, [isSigningUp]);
 
 	return (
-		<PageLayout className="min-h-fit mt-[20vh]">
+		<PageLayout>
 			<BoxContainer>
 				<Form onSubmit={handleAuthAction}>
 					<Header

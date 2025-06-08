@@ -3,6 +3,7 @@
 import './globals.css';
 import { Open_Sans } from 'next/font/google';
 import { UserProvider } from './context/userContext';
+import Footer from './components/Footer';
 
 const openSans = Open_Sans({
 	subsets: ['latin'],
@@ -17,7 +18,6 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className="min-h-screen antialiased bg-custom flex flex-col">
-				{/* Header */}
 				<div className="p-2 self-start w-full flex justify-between items-center">
 					<div>
 						<div
@@ -31,9 +31,7 @@ export default function RootLayout({
 					</div>
 				</div>
 				<UserProvider>{children}</UserProvider>
-				<div className="flex justify-center text-cyan-900 text-xs pb-2">
-					Lisa Marie Herzberg ©2024
-				</div>
+				<Footer/>
 			</body>
 		</html>
 	);

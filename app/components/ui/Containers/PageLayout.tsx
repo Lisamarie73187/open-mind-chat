@@ -11,7 +11,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 }) => {
 	return (
 		<main
-			className={`flex items-center justify-center min-h-screen ${className}`}
+			className={`flex items-center justify-center min-h-[80vh] ${className}`}
 		>
 			<div className="flex justify-center w-full">{children}</div>
 		</main>
